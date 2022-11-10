@@ -1,0 +1,53 @@
+﻿@using smooms.app.Services
+@using smooms.app.Authentication
+<FluentRouter>
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/> 
+    </Found>
+    <NotFound>
+        @if (!PageExists())
+        {
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/", replace: true);
+        }
+    </NotFound>
+</FluentRouter>
+
+@code
+{
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = null!;
+    
+    [Inject]
+    private ClientInfo ClientInfo { get; set; } = null!;
+    
+    [Inject]
+    private IAuthenticationService AuthenticationService { get; set; } = null!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = null!;
+
+    [Inject]
+    private IRouteProvider RouteProvider { get; set; } = null!;
+
+    private bool PageExists()
+    {
+        return RouteProvider.TryMatch(NavigationManager.ToBaseRelativePath(NavigationManager.Uri), out _, out _);
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            ClientInfo.TimeZone = await JsRuntime.InvokeAsync<string>("getClientTimeZone");
+        }
+    }
+}
