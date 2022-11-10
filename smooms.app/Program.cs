@@ -79,7 +79,7 @@ public static class Program
         builder.Services.AddDbContextFactory<AppDbContext>(optionsBuilder =>
         {
             optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("Smooms"))
-                .UseValidationCheckConstraints()
+                .UseAllCheckConstraints()
                 .UseSnakeCaseNamingConvention();
         });
 

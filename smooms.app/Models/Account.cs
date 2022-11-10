@@ -7,16 +7,21 @@ public record AccountId : EntityIdBase<AccountId>;
 
 public class Account : EntityBase<AccountId>
 {
-    [MaxLength(AccountConfiguration.DisplayNameMaxLength)]
-    public required string DisplayName { get; init; } = null!;
+    [StringLength(AccountConfiguration.DisplayNameMaxLength)]
+    public required string DisplayName { get; init; } 
     
-    [MaxLength(AccountConfiguration.EMailMaxLength)]
+    [StringLength(AccountConfiguration.EMailMaxLength)]
     [EmailAddress]
     public required string? EMail { get; init; }
     public required bool EMailVerified { get; init; }
 
-    public required byte[] HashedPassword { get; init; } = null!;
-    public required byte[] Salt { get; init; } = null!;
+    public required byte[] HashedPassword { get; init; }
+    public required byte[] Salt { get; init; }
+    
+    // this is a one-to-many relationship
+    // its the owning side
+    // you can use this navigation property to get all the roles of this account
+    public List<Device> Devices { get; init; } = new();
 }
 
 public class AccountConfiguration : EntityBaseConfiguration<Account, AccountId>
@@ -27,7 +32,7 @@ public class AccountConfiguration : EntityBaseConfiguration<Account, AccountId>
     public override void Configure(EntityTypeBuilder<Account> builder)
     {
         base.Configure(builder);
-
+        
         builder.HasIndex(x => x.EMail).IsUnique();
     }
 }

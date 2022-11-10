@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace smooms.app.Migrations
 {
     /// <inheritdoc />
-    public partial class AddAcoounts : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,7 +25,9 @@ namespace smooms.app.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_account", x => x.id);
+                    table.CheckConstraint("CK_account_display_name_MinLength", "LENGTH(display_name) >= 0");
                     table.CheckConstraint("CK_account_e_mail_EmailAddress", "e_mail ~ '^[^@]+@[^@]+$'");
+                    table.CheckConstraint("CK_account_e_mail_MinLength", "LENGTH(e_mail) >= 0");
                 });
 
             migrationBuilder.CreateIndex(

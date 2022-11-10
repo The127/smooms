@@ -12,8 +12,8 @@ using smooms.app.Models;
 namespace smooms.app.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221108201755_AddAcoounts")]
-    partial class AddAcoounts
+    [Migration("20221110174223_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -65,7 +65,11 @@ namespace smooms.app.Migrations
 
                     b.ToTable("account", null, t =>
                         {
+                            t.HasCheckConstraint("CK_account_display_name_MinLength", "LENGTH(display_name) >= 0");
+
                             t.HasCheckConstraint("CK_account_e_mail_EmailAddress", "e_mail ~ '^[^@]+@[^@]+$'");
+
+                            t.HasCheckConstraint("CK_account_e_mail_MinLength", "LENGTH(e_mail) >= 0");
                         });
                 });
 #pragma warning restore 612, 618
