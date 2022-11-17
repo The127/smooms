@@ -1,5 +1,4 @@
 ﻿using smooms.app.Utils;
-using RouteGroupBuilder = FluentBlazorRouter.RouteGroupBuilder;
 
 namespace smooms.app.Authentication;
 
@@ -20,14 +19,14 @@ public class AuthenticationMetadata
 
 public static class AuthenticationMetadataExtensions
 {
-    public static RouteGroupBuilder RequireAuthentication(this RouteGroupBuilder builder, bool ignoreParents = false)
+    public static void RequireAuthentication(this FluentBlazorRouter.RouteGroupBuilder builder,
+        bool ignoreParents = false)
     {
         builder.WithMetadata(new AuthenticationMetadata
         {
             AuthenticationRequired = true,
             IgnoreParents = ignoreParents,
         });
-        return builder;
     }
     
     public static RouteGroupBuilder RequireRole(this RouteGroupBuilder builder, string roleName, bool ignoreParents = false)
