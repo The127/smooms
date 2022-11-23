@@ -18,6 +18,7 @@ public static class Program
         builder.ConfigureRouting();
         
         builder.Services.AddTransient<IRouterMiddleware, AuthenticationMiddleware>();
+        builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
 
         var app = builder.Build();
 

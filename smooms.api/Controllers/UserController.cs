@@ -5,10 +5,7 @@ using smooms.api.Commands;
 
 namespace smooms.api.Controllers;
 
-[ApiController]
 [Route("api/users")]
-[Produces("application/json")]
-[Consumes("application/json")]
 public class UserController : SmoomsControllerBase
 {
     public UserController(IMediator mediator) : base(mediator)

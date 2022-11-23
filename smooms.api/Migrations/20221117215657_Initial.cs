@@ -18,15 +18,15 @@ namespace smooms.api.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     username = table.Column<string>(name: "user_name", type: "text", nullable: false),
-                    email = table.Column<string>(type: "text", nullable: true),
+                    email = table.Column<string>(type: "text", nullable: false),
                     hashedpassword = table.Column<byte[]>(name: "hashed_password", type: "bytea", nullable: false),
                     salt = table.Column<byte[]>(type: "bytea", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_user", x => x.id);
-                    table.CheckConstraint("CK_user_email_Length", "(\"email\" IS NULL OR LENGTH(\"email\") <= 320");
-                    table.CheckConstraint("CK_user_email_Regex", "(\"email\" IS NULL OR \"email\" ~ '^([\\w\\.\\-]+)@([\\w\\-]+)((\\.(\\w){2,3})+)$'");
+                    table.CheckConstraint("CK_user_email_Length", "LENGTH(\"email\") <= 320");
+                    table.CheckConstraint("CK_user_email_Regex", "\"email\" ~ '^([\\w\\.\\-]+)@([\\w\\-]+)((\\.(\\w){2,5})+)$'");
                     table.CheckConstraint("CK_user_user_name_Length", "LENGTH(\"user_name\") <= 1000");
                 });
 

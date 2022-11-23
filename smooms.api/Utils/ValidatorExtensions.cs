@@ -5,10 +5,11 @@ namespace smooms.api.Utils;
 
 public static class ValidatorExtensions
 {
-    public static IRuleBuilderOptions<T, string?> EmailAddressOrEmpty<T>(this IRuleBuilder<T, string?> ruleBuilder)
+    public static IRuleBuilderOptions<T, string?> ValidEmailAddress<T>(this IRuleBuilder<T, string?> ruleBuilder)
     {
         return ruleBuilder
-            .Must(s => string.IsNullOrEmpty(s) || new EmailAddressAttribute().IsValid(s))
+            .Matches(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$")
+            .MaximumLength(320)
             .WithMessage("'{PropertyName}' is not a valid email address.");
     }
 }

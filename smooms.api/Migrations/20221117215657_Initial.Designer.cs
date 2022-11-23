@@ -13,7 +13,7 @@ using smooms.api.Models;
 namespace smooms.api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221117212224_Initial")]
+    [Migration("20221117215657_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -60,6 +60,7 @@ namespace smooms.api.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("email");
 
@@ -87,9 +88,9 @@ namespace smooms.api.Migrations
 
                     b.ToTable("user", null, t =>
                         {
-                            t.HasCheckConstraint("CK_user_email_Length", "(\"email\" IS NULL OR LENGTH(\"email\") <= 320");
+                            t.HasCheckConstraint("CK_user_email_Length", "LENGTH(\"email\") <= 320");
 
-                            t.HasCheckConstraint("CK_user_email_Regex", "(\"email\" IS NULL OR \"email\" ~ '^([\\w\\.\\-]+)@([\\w\\-]+)((\\.(\\w){2,3})+)$'");
+                            t.HasCheckConstraint("CK_user_email_Regex", "\"email\" ~ '^([\\w\\.\\-]+)@([\\w\\-]+)((\\.(\\w){2,5})+)$'");
 
                             t.HasCheckConstraint("CK_user_user_name_Length", "LENGTH(\"user_name\") <= 1000");
                         });

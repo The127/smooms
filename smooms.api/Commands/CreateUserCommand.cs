@@ -10,7 +10,7 @@ namespace smooms.api.Commands;
 
 public record CreateUserCommand(
     string DisplayName,
-    string EMail,
+    string Email,
     string Password
 ) : CommandBase<CreateUserResponse>;
 
@@ -20,13 +20,14 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     {
         RuleFor(x => x.DisplayName)
             .NotEmpty()
+            .MinimumLength(UserConfiguration.UserNameMinLength)
             .MaximumLength(UserConfiguration.UserNameMaxLength);
 
         RuleFor(x => x.Password)
             .NotEmpty();
 
-        RuleFor(x => x.EMail)
-            .EmailAddressOrEmpty();
+        RuleFor(x => x.Email)
+            .ValidEmailAddress();
     }
 }
 
@@ -52,7 +53,7 @@ public class CreateUserCommandHandler : CommandHanderBase<CreateUserCommand, Cre
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         var doesAccountWithEmailExist = await dbContext.Set<User>()
-            .AnyAsync(x => x.Email == request.EMail, cancellationToken);
+            .AnyAsync(x => x.Email == request.Email, cancellationToken);
 
         if (doesAccountWithEmailExist)
             throw new HttpConflictException("Account with this email already exists");
@@ -64,7 +65,7 @@ public class CreateUserCommandHandler : CommandHanderBase<CreateUserCommand, Cre
         var account = new User
         {
             UserName = request.DisplayName,
-            Email = request.EMail,
+            Email = request.Email,
             HashedPassword = hashedPassword,
             Salt = salt,
         };

@@ -1,10 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Darkarotte.CheckConstraints;
+using CheckConstraints;
 using HttpExceptions;
 using MediatR;
 using MediatR.Extensions.FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
@@ -16,7 +15,7 @@ using smooms.api.Utils;
 
 namespace smooms.api;
 
-internal static class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {
@@ -45,7 +44,7 @@ internal static class Program
             options.SchemaGeneratorOptions.UseInlineDefinitionsForEnums = true;
             options.SchemaGeneratorOptions.SupportNonNullableReferenceTypes = true;
             options.SchemaGeneratorOptions.AddEntityIdJsonSchemaDefinitionFromAssembly(typeof(Program).Assembly);
-            options.ConfigureForNodaTime();
+            // options.ConfigureForNodaTime();
         });
 
         builder.Services.AddHealthChecks();
@@ -66,22 +65,16 @@ internal static class Program
         });
 
         builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddScoped<ClientInfo>();
 
         builder.Services.AddTransient<ISecurityService, SecurityService>();
-        builder.Services.AddScoped<ClientInfo>();
 
         builder.Services.AddOptions<SmoomsOptions>()
             .Bind(builder.Configuration.GetSection("Smooms"))
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        builder.Services.AddDbContextFactory<AppDbContext>(optionsBuilder =>
-        {
-            optionsBuilder.UseNpgsql(builder.Configuration.GetConnectionString("Smooms"),
-                    contextOptionsBuilder => { contextOptionsBuilder.UseNodaTime(); })
-                .UseCheckConstraints()
-                .UseSnakeCaseNamingConvention();
-        });
+        builder.Services.AddAppDbContext(builder.Configuration.GetConnectionString("Smooms"));
 
         var app = builder.Build();
 
@@ -107,5 +100,21 @@ internal static class Program
         await using var dbContext = await dbContextFactory.CreateDbContextAsync();
 
         await dbContext.Database.MigrateAsync();
+    }
+
+    private static void AddAppDbContext(this IServiceCollection serviceCollection, string? connectionString)
+    {
+        serviceCollection.AddDbContextFactory<AppDbContext>(optionsBuilder =>
+        {
+            ConfigureDbContext(optionsBuilder, connectionString);
+        });
+    }
+
+    public static void ConfigureDbContext(DbContextOptionsBuilder optionsBuilder, string? connectionString)
+    {
+        optionsBuilder.UseNpgsql(connectionString,
+                contextOptionsBuilder => { contextOptionsBuilder.UseNodaTime(); })
+            .UseCheckConstraints()
+            .UseSnakeCaseNamingConvention();
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Darkarotte.CheckConstraints;
+using CheckConstraints;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace smooms.api.Models;
@@ -21,7 +21,8 @@ public class User : EntityBase<UserId>
 
 public class UserConfiguration : EntityBaseConfiguration<User, UserId>
 {
-    public const int UserNameMaxLength = 1_000;
+    public const int UserNameMaxLength = 100;
+    public const int UserNameMinLength = 5;
     public const int EmailMaxLength = 320;
 
     public override void Configure(EntityTypeBuilder<User> builder)
@@ -31,7 +32,7 @@ public class UserConfiguration : EntityBaseConfiguration<User, UserId>
         builder.HasIndex(x => x.Email).IsUnique();
 
         builder.Property(x => x.UserName)
-            .HasLengthConstraint(UserNameMaxLength);
+            .HasLengthConstraint(UserNameMaxLength, UserNameMinLength);
 
         builder.Property(x => x.Email)
             .HasLengthConstraint(EmailMaxLength)
