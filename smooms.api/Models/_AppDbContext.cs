@@ -16,14 +16,14 @@ public class AppDbContext : DbContext
         base.OnConfiguring(optionsBuilder);
 
         // reconfigure the context to use Npgsql's name translation, and other features inside linqpad
-        if (InsideLINQPad)
+        if (InsideLinqPad)
         {
             var connectionString = optionsBuilder.Options.FindExtension<NpgsqlOptionsExtension>()?.ConnectionString;
             Program.ConfigureDbContext(optionsBuilder, connectionString);
         }
     }
-    
-    internal bool InsideLINQPad => AppDomain.CurrentDomain.FriendlyName.StartsWith("LINQPad");
+
+    private static bool InsideLinqPad => AppDomain.CurrentDomain.FriendlyName.StartsWith("LINQPad");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
